@@ -312,7 +312,7 @@ Menu BilgiMenu()
 {
 	Menu menu = new Menu(Menu_CallBack62);
 	menu.SetTitle("★ Pandemi ★\n★ ByDexter ★\n \nHerkes birbirinin arasına mesafe koysun");
-	menu.AddItem("X", "Canın 70'in üzerindeyken daha fazla hasar alırsın", ITEMDRAW_DISABLED);
+	menu.AddItem("X", "Canın 60'ın üzerindeyken daha fazla hasar alırsın", ITEMDRAW_DISABLED);
 	menu.AddItem("X", "Virüsü yayarsan 3-8 Ekstra can kazanırsın", ITEMDRAW_DISABLED);
 	menu.AddItem("X", "Canın 30'un altına inerse hızın yükselir", ITEMDRAW_DISABLED);
 	menu.AddItem("X", "Virüslü insanlar daha hızlı koşar", ITEMDRAW_DISABLED);
