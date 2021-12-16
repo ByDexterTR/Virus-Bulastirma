@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <emitsoundany>
 #include <sdktools>
 #include <sdkhooks>
 #include <warden>
@@ -7,6 +8,7 @@ bool Gamestart = false, Block = false;
 int virus = 0;
 bool Hasta[65] = { false, ... };
 bool Bulasma = false;
+bool Muzik = true;
 
 int g_CollisionGroup = -1;
 
@@ -20,7 +22,7 @@ public Plugin myinfo =
 	name = "[JB] Virüs Yayma", 
 	author = "ByDexter", 
 	description = "", 
-	version = "1.0", 
+	version = "1.1", 
 	url = "https://steamcommunity.com/id/ByDexterTR - ByDexter#5494"
 };
 
@@ -57,7 +59,24 @@ public void OnMapStart()
 		Gamestart = false;
 		Bulasma = false;
 		Block = false;
+		Muzik = true;
 		virus = 0;
+		
+		AddFileToDownloadsTable("sound/bydexter/thanos/bbnos_01/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/bbnos_01/mainmenu.mp3");
+		AddFileToDownloadsTable("sound/bydexter/thanos/neckdeep_02/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/neckdeep_02/mainmenu.mp3");
+		AddFileToDownloadsTable("sound/bydexter/thanos/sarahschachner_01/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/sarahschachner_01/mainmenu.mp3");
+		AddFileToDownloadsTable("sound/bydexter/thanos/scarlxrd_01/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/scarlxrd_01/mainmenu.mp3");
+		AddFileToDownloadsTable("sound/bydexter/thanos/scarlxrd_02/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/scarlxrd_02/mainmenu.mp3");
+		AddFileToDownloadsTable("sound/bydexter/thanos/theverkkars_01/mainmenu.mp3");
+		PrecacheSoundAny("bydexter/thanos/theverkkars_01/mainmenu.mp3");
+		
+		AddFileToDownloadsTable("sound/bydexter/thanos/stone_sound/xp_rankdown_02.wav");
+		PrecacheSoundAny("bydexter/thanos/stone_sound/xp_rankdown_02.wav");
 	}
 }
 
@@ -92,7 +111,7 @@ public Action Command_Virus(int client, int args)
 	}
 }
 
-Menu VirusMenu() // Ağlama quantum hadi ( soru sordum bak SP'e )
+Menu VirusMenu()
 {
 	Menu menu = new Menu(Menu_CallBack31);
 	menu.SetTitle("★ Virüs Hizmetleri ★\n★ ByDexter ★\n ");
@@ -114,6 +133,8 @@ Menu VirusMenu() // Ağlama quantum hadi ( soru sordum bak SP'e )
 	}
 	
 	menu.AddItem("2", Bulasma ? "Bulaşma: Birbirine dokununca":"Bulaşma: Hasar Vurunca", Gamestart ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+	
+	menu.AddItem("4", Muzik ? "Müzik: Açık":"Müzik: Kapalı", Gamestart ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
 	return menu;
 }
@@ -187,6 +208,19 @@ public int Menu_CallBack31(Menu menu, MenuAction action, int client, int positio
 				GameStop();
 			}
 		}
+		else if (StringToInt(item) == 4)
+		{
+			if (!Gamestart)
+			{
+				Muzik = !Muzik;
+				
+				VirusMenu().Display(client, 0);
+			}
+			else
+			{
+				PrintToChat(client, "[SM] \x07Oyun başladığı için ayarlar yapılmadı...");
+			}
+		}
 	}
 	else if (action == MenuAction_End)
 	{
@@ -254,7 +288,23 @@ public Action Baslat(Handle timer, any data)
 	{
 		PrintToChatAll("[SM] \x10Virüsü yaymak için birbirinize dokunmalısınız!");
 	}
-	CreateTimer(1.0, Repeat, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	if (Muzik)
+	{
+		int Sarki = GetRandomInt(1, 6);
+		if (Sarki == 1)
+			EmitSoundToAllAny("bydexter/thanos/bbnos_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+		else if (Sarki == 2)
+			EmitSoundToAllAny("bydexter/thanos/sarahschachner_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+		else if (Sarki == 3)
+			EmitSoundToAllAny("bydexter/thanos/scarlxrd_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+		else if (Sarki == 4)
+			EmitSoundToAllAny("bydexter/thanos/scarlxrd_02/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+		else if (Sarki == 5)
+			EmitSoundToAllAny("bydexter/thanos/theverkkars_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+		else if (Sarki == 6)
+			EmitSoundToAllAny("bydexter/thanos/neckdeep_02/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+	}
+	CreateTimer(0.5, Repeat, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	return Plugin_Stop;
 }
 
@@ -262,7 +312,10 @@ Menu BilgiMenu()
 {
 	Menu menu = new Menu(Menu_CallBack62);
 	menu.SetTitle("★ Pandemi ★\n★ ByDexter ★\n \nHerkes birbirinin arasına mesafe koysun");
-	menu.AddItem("X", " ", ITEMDRAW_NOTEXT);
+	menu.AddItem("X", "Canın 70'in üzerindeyken daha fazla hasar alırsın", ITEMDRAW_DISABLED);
+	menu.AddItem("X", "Virüsü yayarsan 3-8 Ekstra can kazanırsın", ITEMDRAW_DISABLED);
+	menu.AddItem("X", "Canın 30'un altına inerse hızın yükselir", ITEMDRAW_DISABLED);
+	menu.AddItem("X", "Virüslü insanlar daha hızlı koşar", ITEMDRAW_DISABLED);
 	menu.ExitButton = false;
 	menu.ExitBackButton = false;
 	return menu;
@@ -297,6 +350,7 @@ void GameStop()
 	}
 	Gamestart = false;
 	Block = false;
+	EmitSoundToAllAny("bydexter/thanos/stone_sound/xp_rankdown_02.wav", SOUND_FROM_PLAYER, 1, 50);
 }
 
 public Action OnClientDead(Event event, const char[] name, bool dB)
@@ -355,11 +409,15 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 			PrintToChatAll("[SM] \x10%N\x01, \x10%N \x01tarafından \x05virüs bulaştırıldı.", victim, attacker);
 			SetEntityRenderColor(victim, 0, 255, 0, 150);
 			SetEntPropFloat(victim, Prop_Data, "m_flLaggedMovementValue", 1.2);
-			PrintToChat(attacker, "[SM] \x0AVirüsü bulaştırdığın için \x05+5 Can");
-			SetEntityHealth(attacker, GetClientHealth(attacker) + 5);
+			int Rastgele = GetRandomInt(3, 8);
+			PrintToChat(attacker, "[SM] \x0AVirüsü bulaştırdığın için \x05+%d Can", Rastgele);
+			SetEntityHealth(attacker, GetClientHealth(attacker) + Rastgele);
 		}
-		damage = 0.0;
-		return Plugin_Changed;
+		if (attacker != victim)
+		{
+			damage = 0.0;
+			return Plugin_Changed;
+		}
 	}
 	return Plugin_Continue;
 }
@@ -373,8 +431,9 @@ public Action OnTouch(int entity, int other)
 		PrintToChatAll("[SM] \x10%N\x01, \x10%N \x01tarafından \x05virüs bulaştırıldı.", other, entity);
 		SetEntityRenderColor(other, 0, 255, 0, 150);
 		SetEntPropFloat(other, Prop_Data, "m_flLaggedMovementValue", 1.2);
-		PrintToChat(entity, "[SM] \x0AVirüsü bulaştırdığın için \x05+5 Can");
-		SetEntityHealth(entity, GetClientHealth(entity) + 5);
+		int Rastgele = GetRandomInt(3, 8);
+		PrintToChat(entity, "[SM] \x0AVirüsü bulaştırdığın için \x05+%d Can", Rastgele);
+		SetEntityHealth(entity, GetClientHealth(entity) + Rastgele);
 	}
 }
 
@@ -388,11 +447,15 @@ public Action Repeat(Handle timer, any data)
 		if (IsPlayerAlive(i) && GetClientTeam(i) == 2 && Hasta[i])
 		{
 			DealDamage(i, 1, i, DMG_GENERIC, "weapon_ak47");
-			if (GetClientHealth(i) == 20)
+			if (GetClientHealth(i) == 30)
 			{
 				PrintToChat(i, "[SM] Hastalığın ilerledi.");
 				SetEntPropFloat(i, Prop_Data, "m_flLaggedMovementValue", 1.4);
 				SetEntityGravity(i, 0.86);
+			}
+			else if (GetClientHealth(i) >= 60)
+			{
+				DealDamage(i, 1, i, DMG_GENERIC, "weapon_ak47");
 			}
 		}
 	}
